@@ -1,0 +1,89 @@
+1. Azure での ID とガバナンスの管理
+1.1 Azure Active Directory に Azure のユーザーとグループを作成する
+■ユーザとロール
+ユーザまたはグループにロールを付与することでアクセスを制御する。
+ユーザには以下の種類がある。
+・管理者ロール
+　ユーザーの作成または編集、他のユーザーへの管理者ロールの割り当て、
+　ユーザー パスワードのリセット、ユーザー ライセンスの管理などをユーザーに許可できます。
+・メンバーユーザ
+　自分のプロファイル情報を管理できる権限など、一連の既定のアクセス許可を付与されたAzure AD 組織のネイティブ メンバーです。
+　新しいユーザーが組織に参加したとき、通常はこの種類のアカウントがそのユーザー用に作成されます。
+・ゲストユーザ
+　制限された Azure AD 組織のアクセス許可が付与されます。
+　ユーザーを招待する場合は、そのユーザーをゲスト ユーザーとして Azure AD 組織に追加します。
+　次に、受諾リンクを含む招待メールを送信するか、共有するアプリへの直接リンクを送信できます。
+　既定では、Azure AD のメンバー ユーザーはゲスト ユーザーを招待できます。（管理者によって無効にすることも可能）
+　組織外部のパートナーと協力しなければならない場合に活用。
+
+■ユーザー アカウントの追加
+・Azure CLI
+az ad user create
+
+・Azure PowerShell
+New-AzureADUser
+
+・Azure PowerShellを用いてCSVファイルから一括登録
+---------------------------------------
+$invitations = import-csv c:\bulkinvite\invitations.csv
+
+$messageInfo = New-Object Microsoft.Open.MSGraph.Model.InvitedUserMessageInfo
+
+$messageInfo.customizedMessageBody = "Hello. You are invited to the Contoso organization."
+
+foreach ($email in $invitations)
+   {New-AzureADMSInvitation `
+      -InvitedUserEmailAddress $email.InvitedUserEmailAddress `
+      -InvitedUserDisplayName $email.Name `
+      -InviteRedirectUrl https://myapps.microsoft.com `
+      -InvitedUserMessageInfo $messageInfo `
+      -SendInvitationMessage $true
+   }
+---------------------------------------
+
+■ユーザアカウントの削除
+ユーザーを削除すると、そのアカウントは 30 日間、中断状態になり、その間であれば復元可能。
+・Azure CLI
+az ad user delete
+・Azure PowerShell
+Remove-AzureADUser
+
+■Azure AD 組織を作成する
+1. Azure ADの画面内の[作成]をクリック
+2. [テナントを作成する]ウィンドウ内で以下の情報を入力
+・組織名: Contoso Marketing Company
+・初期ドメイン名: contosomarketingXXXXXX（XXXXXXには重複しないように任意の文字列を入力）
+3. [作成] を選択
+4. 作成が完了するまで待つ
+5. [Click here to manage your new tenant](ここをクリックして新しいテナントを管理する) を選択して、新しいテナントに移動
+
+■ユーザを作成する
+1. [テナント情報]に表示されている[プライマリ ドメイン名]を控えておく
+2. Azure AD 組織の [管理] で、[ユーザー] > [新しいユーザー] を選択
+3. [ユーザー] ペインに以下の情報を入力
+・ユーザー名: chris@contosomarketingXXXXXX.onmicrosoft.com
+・名前: Chris Green
+4. [パスワードの表示] を選択してパスワードを控えておく
+5. [作成] を選択
+
+■ユーザを削除する
+1. Azure AD 組織の [管理] で、[ユーザー]を選択
+2. ユーザChris Greenを選択
+3. [ユーザーの削除] を選択します。 このオプションが表示されない場合は、[その他] を選択します。
+4. [OK] を選択
+
+■削除されたユーザを復元する
+1. Azure AD 組織の [管理] で、[ユーザー] > [削除済みのユーザー] を選択
+2. これで、過去 30 日以内に削除されたすべてのユーザーが表示されます。
+3. Chris Green を選択し、[ユーザーの復元] を選択します。
+4. [OK] を選択して確認します。
+5. Chris Green のアカウントが復元されたことを確かめるために、[すべてのユーザー] を選択します。
+
+■Azure AD でのアクセス管理
+・
+
+
+
+
+
+
